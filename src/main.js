@@ -1,0 +1,26 @@
+// Romario Linares
+// Created: 5/5/2024
+// Phaser: 3.70.0
+//
+// Gallery Shooter
+//
+// 
+// Art assets from Kenny Assets "" set:
+// 
+
+"use strict"
+
+// game config
+let config = {
+    parent: 'phaser-game',
+    type: Phaser.CANVAS,
+    render: {
+        pixelArt: true  // prevent pixel art from getting blurred when scaled
+    },
+    width: 800,
+    height: 600,
+    scene: [Game],
+    fps: {forceSetTimeOut: true, target: 30}
+}
+
+const game = new Phaser.Game(config);
