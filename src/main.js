@@ -5,7 +5,7 @@
 // Gallery Shooter
 //
 // 
-// Art assets from Kenny Assets "" set:
+// Art and sound assets from Kenny Assets "" set:
 // 
 
 "use strict"
