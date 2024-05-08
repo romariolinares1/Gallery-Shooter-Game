@@ -95,21 +95,25 @@ class Game extends Phaser.Scene {
         //creating spiral path for boss wave
         this.spiral = new Phaser.Curves.Spline(this.newPoints);  
 
-        my.sprite.player = this.add.sprite(game.config.width/2, game.config.height - 40, "gameParts1", "playerShip1_green.png");
-        my.sprite.player.setScale(0.5);
+        // my.sprite.player = this.add.sprite(game.config.width/2, game.config.height - 40, "gameParts1", "playerShip1_green.png");
+        // my.sprite.player.setScale(0.5);
 
         this.left = this.input.keyboard.addKey("A");
         this.right = this.input.keyboard.addKey("D");
+
+        this.player = new Player(this, game.config.width/2, game.config.height - 40, "gameParts1", "playerShip1_green.png", 10, this.left, this.right, 1);
+
         this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-        this.playerSpeed = 10;
+        //this.playerSpeed = 10;
         this.bulletSpeed = 20;
-        this.enemyBulletSpeed = 10;
+        this.enemyBulletSpeed = 25;
     }
 
     createWave() {
         switch(this.wave) {
             case 1:
+                //console.log("spawned case1");
                 let zigzagger1 = new Enemy(this, 100, 20, "gameParts1", "enemyBlack4.png", 10, this.zigzag, 0.5);
                 let zigzagger2 = new Enemy(this, 500, 20, "gameParts1", "enemyBlack4.png", 10, this.zigzagFlip, 0.5);
                 let zigzagger3 = new Enemy(this, 300, 20, "gameParts1", "enemyBlack4.png", 10, this.zigzag, 0.5);
@@ -143,7 +147,7 @@ class Game extends Phaser.Scene {
                 this.my.enemyList.push(curver6);
                 break;
             case 4:
-                let boss = new Enemy(this, 400, 0, "gameParts2", "spaceShips_007.png", 10, this.spiral, 1);
+                let boss = new Enemy(this, 400, 0, "gameParts2", "spaceShips_007.png", 10, this.spiral, 1, true, 5, 10);
                 this.enemiesLeft = 1;
                 this.my.enemyList.push(boss);
             default:
@@ -163,23 +167,29 @@ class Game extends Phaser.Scene {
         this.bg.tilePositionY -= 5;
 
         this.waveCheck();
+        this.player.update();
+        if (this.player.alive == false) {
+            for (let enemy of this.my.enemyList) {
+                enemy.destroy();
+            }
+            for (let bullet of my.sprite.bullet) {
+                bullet.destroy();
+            }
+            for (let enemyBullet of my.sprite.enemyBullet) {
+                enemyBullet.destroy();
+            }
+            this.my.enemyList = [];
+            my.sprite.bullet = [];
+            my.sprite.enemyBullet = [];
+            this.wave = 1;
+            this.scene.restart();
+            // this.scene.start("gameOver");
+        }
         //console.log(this.wave);
-
-        if (this.left.isDown) {
-            if (my.sprite.player.x > (my.sprite.player.displayWidth/2)) {
-                my.sprite.player.x -= this.playerSpeed;
-            }
-        }
-
-        if (this.right.isDown) {
-            if (my.sprite.player.x < (game.config.width - (my.sprite.player.displayWidth/2))) {
-                my.sprite.player.x += this.playerSpeed;
-            }
-        }
 
         if (Phaser.Input.Keyboard.JustDown(this.space)) {
             if (my.sprite.bullet.length < this.maxBullets) {
-                my.sprite.bullet.push(this.add.sprite(my.sprite.player.x, my.sprite.player.y-(my.sprite.player.displayHeight/2), "gameParts1", "laserGreen05.png"));
+                my.sprite.bullet.push(this.add.sprite(this.player.x, this.player.y-(this.player.displayHeight/2), "gameParts1", "laserGreen05.png"));
                 this.sound.play("playerBullet", {
                     volume: 0.2
                 });
@@ -190,7 +200,7 @@ class Game extends Phaser.Scene {
 
         for (let bullet of my.sprite.bullet) {
             for (let enemy of this.my.enemyList) { 
-                if (this.collides(enemy, bullet)) {
+                if (this.collides(enemy, bullet) && bullet.visible == true) {
                     if (enemy.alive == true) {
                         //console.log(enemy);
                         enemy.alive = false;
@@ -210,9 +220,13 @@ class Game extends Phaser.Scene {
             bullet.y -= this.bulletSpeed;
         }
 
-        // for (let bullet of my.sprite.enemyBullet) {
-        //     bullet.y += this.enemyBulletSpeed;
-        // }
+        for (let bullet of my.sprite.enemyBullet) {
+            bullet.y += this.enemyBulletSpeed;
+            if (this.collides(bullet, this.player) && bullet.visible == true) {
+                bullet.destroy();
+                this.player.takeDamage();
+            }
+        }
 
         for (let enemy of this.my.enemyList) {
             if (enemy.alive == true) {
@@ -220,18 +234,11 @@ class Game extends Phaser.Scene {
             }
 
             if (enemy.shouldShoot == true) {
-                // my.sprite.enemyBullet.push(enemy.x, enemy.y-(enemy.displayHeight/2), "gameParts1", "laserRed02.png"); 
-                my.sprite.bullet.push(this.add.sprite(my.sprite.player.x, my.sprite.player.y-(my.sprite.player.displayHeight/2), "gameParts1", "laserRed05.png"));
+                my.sprite.enemyBullet.push(this.add.sprite(enemy.x, enemy.y-(enemy.displayHeight/2), "gameParts1", "laserRed02.png")); 
+                //my.sprite.bullet.push(this.add.sprite(my.sprite.player.x, my.sprite.player.y-(my.sprite.player.displayHeight/2), "gameParts1", "laserRed05.png"));
                 enemy.shouldShoot = false;
             }
         }
-
-        // my.sprite.enemyBullet = my.sprite.enemyBullet.filter((bullet) => bullet.y > -(bullet.displayHeight/2));
-
-
-        // for (let bullet of my.sprite.enemyBullet) {
-        //     bullet.y += this.enemyBulletSpeed;
-        // }
         
         if (this.my.enemyList.every(this.isDead)) {
             this.my.enemyList = [];
