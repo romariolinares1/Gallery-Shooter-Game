@@ -36,7 +36,6 @@ class Enemy extends Phaser.GameObjects.PathFollower {
         if (this.currentCooldown <= 0) {
             console.log("shot bullet");
             this.shouldShoot = true;
-            // this.bulletGroup.push(this.x, this.y-(this.displayHeight/2), "gameParts1", "laserRed02.png"); 
             this.resetCooldown();
         }
     }

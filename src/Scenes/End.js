@@ -1,6 +1,6 @@
-class GameOver extends Phaser.Scene {
+class End extends Phaser.Scene {
     constructor() {
-        super("gameOver");
+        super("end");
 
         this.my = {sprite: {}, text: {}};
     }
@@ -12,7 +12,7 @@ class GameOver extends Phaser.Scene {
     create() {
         let my = this.my;
 
-        this.add.text(10, 5, "Game Over!", {
+        this.add.text(10, 5, "Congrats you beat the game!", {
             fontFamily: 'Times, serif',
             fontSize: 50,
             wordWrap: {
@@ -20,9 +20,9 @@ class GameOver extends Phaser.Scene {
             }
         });
 
-        const button = this.add.text(20, 200, "Start Over", { fill: '#0f0', fontSize: 30 })
+        const button = this.add.text(20, 400, "Go back to title", { fill: '#0f0', fontSize: 30 })
             .setInteractive()
-            .on("pointerdown", () => this.scene.start("game"));
+            .on("pointerdown", () => this.scene.start("title"));
     }
 
     update() {

@@ -14,13 +14,13 @@ class Title extends Phaser.Scene {
 
         this.add.text(10, 5, "Space Shoot Game!", {
             fontFamily: 'Times, serif',
-            fontSize: 24,
+            fontSize: 50,
             wordWrap: {
                 width: 60
             }
         });
 
-        const button = this.add.text(100, 100, "Start Game!", { fill: '#0f0' })
+        const button = this.add.text(20, 200, "Start Game!", { fill: '#0f0', fontSize: 30 })
             .setInteractive()
             .on("pointerdown", () => this.scene.start("game"));
     }
